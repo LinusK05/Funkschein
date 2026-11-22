@@ -236,7 +236,8 @@ label{font-weight:600}
 .tchip{padding:8px 12px;border-radius:99px;border:1px solid var(--line);background:var(--bg);font-size:14px;cursor:pointer}.tchip.ok{border-color:var(--ok);color:var(--ok);font-weight:600}
 @media(max-width:600px){.trow{grid-template-columns:minmax(0,1fr) 56px auto}.trow .meter{grid-column:1/-1;order:3}}
 @media(max-width:760px){nav{flex-wrap:nowrap;overflow-x:auto;width:100%;margin-left:0;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav a{flex:none}}
-.radio,.ptt{-webkit-touch-callout:none}
+.radio,.radio *,.ptt,.ptt *,#quick,#clearMsg,.opt,.qnav button,nav a,.tchip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.ptt,.radio .dbtn{touch-action:none}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 <script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script>
@@ -1733,6 +1734,12 @@ function startTask(id, o = {}) {
     radio.pttUp(msg.value);
   };
   ptt.addEventListener('pointerdown', e => { e.preventDefault(); try { ptt.setPointerCapture(e.pointerId); } catch (x) {} down(); });
+  const noSel = () => { try { const sel = window.getSelection(); if (sel && sel.rangeCount) sel.removeAllRanges(); } catch (x) {} };
+  [ptt, $('#radioHost')].forEach(el => { el.addEventListener('contextmenu', e => e.preventDefault()); el.addEventListener('selectstart', e => e.preventDefault()); });
+  ptt.addEventListener('touchstart', e => { e.preventDefault(); }, { passive: false });
+  $('#radioHost').addEventListener('touchstart', e => { if (e.target.closest('[data-k="dist"]')) e.preventDefault(); }, { passive: false });
+  document.addEventListener('selectstart', e => { if (ptt.classList.contains('on') || radio.s.holdT) e.preventDefault(); });
+  ptt.addEventListener('pointerdown', noSel);
   ptt.addEventListener('pointerup', rel); ptt.addEventListener('pointercancel', rel); ptt.addEventListener('lostpointercapture', rel);
   ptt.addEventListener('keydown', e => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); down(); } });
   ptt.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); rel(); } });
